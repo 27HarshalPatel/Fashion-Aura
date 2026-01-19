@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fashion Aura - Virtual Try-On</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+    
+    :root {
+      --bg-primary: #0a0e1a;
+      --bg-secondary: #111827;
+      --bg-card: #1a1f35;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --text-primary: #f9fafb;
+      --text-secondary: #9ca3af;
+      --border: #374151;
+      --success: #10b981;
+    }
+
+    * { 
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #0a0e1a 0%, #1a1f35 100%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
+      animation: gradientShift 20s ease infinite;
+      pointer-events: none;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(5%, 5%); }
+    }
+
+    /* Header */
+    header {
+      text-align: center;
+      padding: 40px 24px 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .logo {
+      font-size: 48px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+      animation: fadeInDown 0.8s ease;
+    }
+
+    .tagline {
+      font-size: 18px;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto 8px;
+      animation: fadeInUp 0.8s ease 0.2s both;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
+      opacity: 0.8;
+      animation: fadeInUp 0.8s ease 0.3s both;
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Main Layout */
+    main {
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 24px;
+      max-width: 1800px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .panel {
+      background: rgba(26, 31, 53, 0.6);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      padding: 24px;
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: slideIn 0.6s ease;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .panel:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 24px 70px rgba(99, 102, 241, 0.2);
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .panel:nth-child(1) { animation-delay: 0.1s; }
+    .panel:nth-child(2) { animation-delay: 0.2s; }
+    .panel:nth-child(3) { animation-delay: 0.3s; }
+
+    h3 {
+      margin: 0 0 20px;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h3::before {
+      content: '';
+      width: 4px;
+      height: 20px;
+      background: linear-gradient(135deg, var(--accent), #a855f7);
+      border-radius: 2px;
+    }
+
+    /* Upload Section */
+    .upload-area {
+      border: 2px dashed var(--border);
+      border-radius: 16px;
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: rgba(17, 24, 39, 0.4);
+      margin-bottom: 16px;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .upload-area:hover {
+      border-color: var(--accent);
+      background: rgba(99, 102, 241, 0.05);
+      transform: scale(1.02);
+    }
+
+    .upload-area.has-image {
+      padding: 0;
+      border-style: solid;
+      border-color: var(--success);
+    }
+
+    .upload-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
+
+    .upload-text {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .upload input {
+      display: none;
+    }
+
+    .preview {
+      width: 100%;
+      height: 500px;
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(17, 24, 39, 0.4);
+      position: relative;
+    }
+
+    .preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      animation: zoomIn 0.5s ease;
+    }
+
+    .preview-placeholder {
+      text-align: center;
+      color: var(--text-secondary);
+      padding: 40px 20px;
+    }
+
+    /* Download Button */
+    .download-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 44px;
+      height: 44px;
+      background: rgba(99, 102, 241, 0.9);
+      backdrop-filter: blur(10px);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      font-size: 20px;
+      z-index: 10;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .download-btn:hover {
+      background: var(--accent);
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+    }
+
+    .download-btn:active {
+      transform: scale(0.95);
+    }
+
+    @keyframes zoomIn {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* Custom Garment Upload Section */
+    .custom-upload-section {
+      margin-bottom: 16px;
+      padding: 12px;
+      background: rgba(17, 24, 39, 0.4);
+      border-radius: 12px;
+      border: 1px dashed var(--border);
+    }
+
+    .custom-upload-label {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text-secondary);
+    }
+
+    .custom-upload-controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .upload-custom-btn {
+      flex: 1;
+      padding: 8px 16px;
+      background: rgba(99, 102, 241, 0.2);
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      color: var(--text-primary);
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.3s ease;
+      font-weight: 600;
+    }
+
+    .upload-custom-btn:hover {
+      background: rgba(99, 102, 241, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .custom-garment-preview {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: rgba(17, 24, 39, 0.6);
+      display: none;
+      border: 2px solid var(--success);
+    }
+
+    .custom-garment-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Filters */
+    .filters {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .filters button {
+      flex: 1;
+      padding: 12px 20px;
+      background: rgba(17, 24, 39, 0.6);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .filters button::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: var(--accent);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.4s ease, height 0.4s ease;
+      z-index: -1;
+    }
+
+    .filters button:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .filters button.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    }
+
+    /* Garment Grid Scroll */
+    .garment-panel-scroll {
+      height: 550px;
+      overflow-y: auto;
+      padding-right: 8px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--accent) var(--bg-secondary);
+    }
+
+    .garment-panel-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .garment-panel-scroll::-webkit-scrollbar-track {
+      background: var(--bg-secondary);
+      border-radius: 10px;
+    }
+
+    .garment-panel-scroll::-webkit-scrollbar-thumb {
+      background: var(--accent);
+      border-radius: 10px;
+    }
+
+    /* Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .item {
+      background: rgba(17, 24, 39, 0.6);
+      border-radius: 12px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .item::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    .item:hover::after {
+      opacity: 1;
+    }
+
+    .item:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+    }
+
+    .item-image {
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      object-fit: cover;
+      display: block;
+    }
+
+    .item-info {
+      padding: 8px;
+      background: rgba(17, 24, 39, 0.9);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .item-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-primary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .item-price {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--success);
+    }
+
+    .item-original-price {
+      font-size: 11px;
+      color: var(--text-secondary);
+      text-decoration: line-through;
+      margin-left: 4px;
+    }
+
+    .item-discount {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      z-index: 2;
+    }
+
+    .buy-btn {
+      width: 100%;
+      padding: 6px;
+      background: linear-gradient(135deg, var(--accent), #a855f7);
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 4px;
+      position: relative;
+      z-index: 3;
+    }
+
+    .buy-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    }
+
+    .buy-btn:active {
+      transform: translateY(0);
+    }
+
+    .item.selected {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+    }
+
+    .item.selected::before {
+      content: '✓';
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 28px;
+      height: 28px;
+      background: var(--accent);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      z-index: 2;
+      animation: checkmark 0.3s ease;
+    }
+
+    @keyframes checkmark {
+      0% { transform: scale(0) rotate(0deg); }
+      50% { transform: scale(1.2) rotate(180deg); }
+      100% { transform: scale(1) rotate(360deg); }
+    }
+
+    /* Load More */
+    .load-more {
+      width: 100%;
+      padding: 12px;
+      background: rgba(17, 24, 39, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text-primary);
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .load-more:hover {
+      background: rgba(99, 102, 241, 0.1);
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    /* Action Button */
+    .action {
+      margin-top: 20px;
+    }
+
+    .action button {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--accent), #a855f7);
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      color: white;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .action button::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.6s ease, height 0.6s ease;
+    }
+
+    .action button:hover::before {
+      width: 400px;
+      height: 400px;
+    }
+
+    .action button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+    }
+
+    .action button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .status {
+      margin-top: 12px;
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 14px;
+      min-height: 20px;
+    }
+
+    .status.processing {
+      color: var(--accent);
+      animation: pulse 1.5s ease infinite;
+    }
+
+    .status.success {
+      color: var(--success);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* Responsive */
+    @media (max-width: 1400px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+      
+      .garment-panel-scroll {
+        height: 400px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="logo">Fashion Aura</div>
+  <p class="tagline">Experience the future of fashion with AI-powered virtual try-on</p>
+  <p class="subtitle">Transform your style instantly • See before you buy • Try endless possibilities</p>
+  <div style="max-width: 800px; margin: 12px auto 0; padding: 12px 20px; background: rgba(255, 193, 7, 0.1); border: 1px solid rgba(255, 193, 7, 0.3); border-radius: 12px; font-size: 12px; color: var(--text-secondary); line-height: 1.6;">
+    <strong style="color: #ffc107;">⚠️ Disclaimer:</strong> This site is not affiliated with, endorsed by, or sponsored by any of the brands shown. All product images, brand names, and trademarks are the property of their respective owners. We are an independent virtual try-on service. Product links redirect to official brand websites for your convenience.
+  </div>
+</header>
+
+<main>
+  <!-- User Photo Panel -->
+  <div class="panel upload">
+    <h3>User Photo</h3>
+    <div class="upload-area" id="uploadArea">
+      <div class="upload-icon">📸</div>
+      <div class="upload-text">Click to upload your photo</div>
+    </div>
+    <input type="file" id="userFile" accept="image/*" />
+  </div>
+
+  <!-- Garments Panel -->
+  <div class="panel">
+    <h3>Choose Garment</h3>
+
+    <!-- NEW: Custom Garment Upload Section -->
+    <div class="custom-upload-section">
+      <div class="custom-upload-label">Or upload your own garment:</div>
+      <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; line-height: 1.5;">
+        💡 <strong>Upload tips:</strong><br>
+        • Product photos with models work great!<br>
+        • Name your file (in .png, .jpg or .jpeg format): <code style="background: rgba(99, 102, 241, 0.2); padding: 2px 6px; border-radius: 4px;">shirt.jpg</code>, <code style="background: rgba(99, 102, 241, 0.2); padding: 2px 6px; border-radius: 4px;">pants.jpg</code>, <code style="background: rgba(99, 102, 241, 0.2); padding: 2px 6px; border-radius: 4px;">dress.jpg</code>, <code style="background: rgba(99, 102, 241, 0.2); padding: 2px 6px; border-radius: 4px;">jacket.jpg</code><br>
+        • Clear, well-lit images give best results
+      </div>
+      <div class="custom-upload-controls">
+        <input type="file" id="customGarmentFile" accept="image/*" style="display: none;" />
+        <button id="uploadCustomBtn" class="upload-custom-btn">📁 Upload Garment</button>
+        <div id="customGarmentPreview" class="custom-garment-preview"></div>
+      </div>
+    </div>
+
+    <div class="filters">
+      <button id="menBtn" class="active">Men</button>
+      <button id="womenBtn">Women</button>
+    </div>
+
+    <div class="garment-panel-scroll">
+      <div class="grid" id="grid"></div>
+      <button class="load-more" id="loadMore">Load more</button>
+    </div>
+  </div>
+
+  <!-- Result Panel -->
+  <div class="panel">
+    <h3>Result</h3>
+    <div class="preview" id="resultPreview">
+      <div class="preview-placeholder">
+        <div style="font-size: 64px; margin-bottom: 12px;">✨</div>
+        <div>Your try-on result will appear here</div>
+      </div>
+    </div>
+
+    <div class="action">
+      <button id="tryOnBtn">Virtual Try-On</button>
+      <div class="status" id="status"></div>
+      <div class="status" id="detectedType" style="margin-top: 8px; font-size: 12px;"></div>
+    </div>
+  </div>
+</main>
+
+<script>
+const API = "http://localhost:8000";
+
+let gender = "Men";
+let offset = 0;
+let selectedGarment = null;
+let userFile = null;
+let customGarmentFile = null; // NEW: for user-uploaded garment
+let detectedGarmentType = "shirt"; // Default
+
+const grid = document.getElementById("grid");
+const status = document.getElementById("status");
+const uploadArea = document.getElementById("uploadArea");
+
+let resultImageBlob = null; // Store the result for download
+
+// ---------------- Auto-detect Garment Type ----------------
+function detectGarmentType(product) {
+  const title = product.title.toLowerCase();
+  const category = product.category ? product.category.toLowerCase() : "";
+  
+  // Define keywords for each garment type
+  const garmentPatterns = {
+    // Upper body
+    'shirt': ['shirt', 'tshirt', 't-shirt', 'blouse', 'top', 'polo', 'tee'],
+    'jacket': ['jacket', 'blazer', 'coat', 'cardigan', 'sweater', 'hoodie', 'sweatshirt'],
+    
+    // Lower body
+    'pants': ['pant', 'trouser', 'jean', 'jeans', 'chino', 'slack', 'jogger'],
+    'shorts': ['short', 'bermuda'],
+    
+    // Full body
+    'dress': ['dress', 'gown', 'jumpsuit', 'romper', 'overall'],
+    
+    // Accessories
+    'vest': ['vest', 'waistcoat'],
+    'skirt': ['skirt']
+  };
+  
+  // Check title and category for matches
+  const searchText = `${title} ${category}`;
+  
+  for (const [type, keywords] of Object.entries(garmentPatterns)) {
+    if (keywords.some(keyword => searchText.includes(keyword))) {
+      detectedGarmentType = type;
+      console.log(`✓ Auto-detected garment type: ${type} for "${product.title}"`);
+      
+      // Show user what was detected
+      const typeDisplay = document.getElementById('detectedType');
+      if (typeDisplay) {
+        typeDisplay.textContent = `Detected: ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+        typeDisplay.style.color = 'var(--success)';
+      }
+      
+      return type;
+    }
+  }
+  
+  // Default to shirt if no match found
+  detectedGarmentType = 'shirt';
+  console.log(`⚠ Could not detect type for "${product.title}", defaulting to shirt`);
+  
+  const typeDisplay = document.getElementById('detectedType');
+  if (typeDisplay) {
+    typeDisplay.textContent = 'Detected: Shirt (default)';
+    typeDisplay.style.color = 'var(--text-secondary)';
+  }
+  
+  return 'shirt';
+}
+
+// ---------------- Upload Preview ----------------
+uploadArea.onclick = () => {
+  document.getElementById("userFile").click();
+};
+
+document.getElementById("userFile").onchange = e => {
+  userFile = e.target.files[0];
+  if (!userFile) return;
+
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    uploadArea.innerHTML = `<img src="${event.target.result}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">`;
+    uploadArea.style.padding = '0';
+    uploadArea.style.border = '2px solid var(--success)';
+    uploadArea.style.minHeight = '500px';
+  };
+  reader.readAsDataURL(userFile);
+};
+
+// ---------------- NEW: Custom Garment Upload ----------------
+document.getElementById('uploadCustomBtn').onclick = () => {
+  document.getElementById('customGarmentFile').click();
+};
+
+document.getElementById('customGarmentFile').onchange = e => {
+  customGarmentFile = e.target.files[0];
+  if (!customGarmentFile) return;
+
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    const preview = document.getElementById('customGarmentPreview');
+    preview.innerHTML = `<img src="${event.target.result}">`;
+    preview.style.display = 'block';
+    
+    // Deselect catalog garments
+    document.querySelectorAll(".item").forEach(i => i.classList.remove("selected"));
+    selectedGarment = null;
+    
+    // Auto-detect type from filename or default to shirt
+    const filename = customGarmentFile.name.toLowerCase();
+    if (filename.includes('dress')) detectedGarmentType = 'dress';
+    else if (filename.includes('pant') || filename.includes('jean')) detectedGarmentType = 'pants';
+    else if (filename.includes('jacket') || filename.includes('coat')) detectedGarmentType = 'jacket';
+    else if (filename.includes('skirt')) detectedGarmentType = 'skirt';
+    else detectedGarmentType = 'shirt';
+    
+    const typeDisplay = document.getElementById('detectedType');
+    if (typeDisplay) {
+      typeDisplay.textContent = `Detected: ${detectedGarmentType.charAt(0).toUpperCase() + detectedGarmentType.slice(1)} (custom)`;
+      typeDisplay.style.color = 'var(--success)';
+    }
+  };
+  reader.readAsDataURL(customGarmentFile);
+};
+
+// ---------------- Load Products ----------------
+async function loadProducts(reset = false) {
+  if (reset) {
+    offset = 0;
+    grid.innerHTML = "";
+  }
+
+  const res = await fetch(
+    `${API}/products?gender=${gender}&limit=12&offset=${offset}`
+  );
+  const data = await res.json();
+
+  data.items.forEach(p => {
+    const div = document.createElement("div");
+    div.className = "item";
+    
+    // Calculate discount if available
+    const discountHtml = p.discount 
+      ? `<div class="item-discount">${p.discount}% OFF</div>` 
+      : '';
+    
+    // Price display
+    const priceHtml = p.original_price 
+      ? `<div class="item-price">${p.price}<span class="item-original-price">${p.original_price}</span></div>`
+      : `<div class="item-price">${p.price}</div>`;
+    
+    div.innerHTML = `
+      ${discountHtml}
+      <img src="${API}${p.image_url}" class="item-image" />
+      <div class="item-info">
+        <div class="item-title">${p.title}</div>
+        ${priceHtml}
+        <button class="buy-btn" onclick="window.open('${p.buy_url || '#'}', '_blank'); event.stopPropagation();">
+          🛒 Buy Now
+        </button>
+      </div>
+    `;
+    
+    // Select garment for try-on (click on image area)
+    const imgElement = div.querySelector('.item-image');
+    imgElement.onclick = (e) => {
+      e.stopPropagation();
+      document.querySelectorAll(".item").forEach(i => i.classList.remove("selected"));
+      div.classList.add("selected");
+      selectedGarment = p;
+      
+      // Clear custom garment when selecting catalog
+      customGarmentFile = null;
+      const preview = document.getElementById('customGarmentPreview');
+      if (preview) {
+        preview.style.display = 'none';
+        preview.innerHTML = '';
+      }
+      
+      // Auto-detect garment type from title/category
+      detectGarmentType(p);
+    };
+    
+    grid.appendChild(div);
+  });
+
+  offset += data.items.length;
+}
+
+loadProducts();
+
+// ---------------- Filters ----------------
+menBtn.onclick = () => {
+  gender = "Men";
+  menBtn.classList.add("active");
+  womenBtn.classList.remove("active");
+  loadProducts(true);
+};
+
+womenBtn.onclick = () => {
+  gender = "Women";
+  womenBtn.classList.add("active");
+  menBtn.classList.remove("active");
+  loadProducts(true);
+};
+
+loadMore.onclick = () => loadProducts();
+
+// ---------------- Try On (UPDATED) ----------------
+tryOnBtn.onclick = async () => {
+  if (!userFile) {
+    status.textContent = "⚠️ Please upload your photo";
+    status.className = "status";
+    return;
+  }
+
+  if (!selectedGarment && !customGarmentFile) {
+    status.textContent = "⚠️ Please select a garment or upload your own";
+    status.className = "status";
+    return;
+  }
+
+  status.textContent = `✨ Processing ${detectedGarmentType} try-on... (4-8 seconds)`;
+  status.className = "status processing";
+  tryOnBtn.disabled = true;
+
+  const form = new FormData();
+  form.append("user_image", userFile);
+  form.append("garment_type", detectedGarmentType);
+
+  // Use custom garment OR catalog garment
+  if (customGarmentFile) {
+    form.append("garment_image", customGarmentFile);
+  } else if (selectedGarment) {
+    form.append("garment_image_url", selectedGarment.image_url);
+  }
+
+  try {
+    const res = await fetch(`${API}/virtual-try-on`, {
+      method: "POST",
+      body: form
+    });
+
+    if (!res.ok) throw new Error("Try-on failed");
+
+    const blob = await res.blob();
+    resultImageBlob = blob; // Store for download
+    
+    const img = document.createElement("img");
+    img.src = URL.createObjectURL(blob);
+
+    const box = document.getElementById("resultPreview");
+    box.innerHTML = "";
+    box.appendChild(img);
+    
+    // Add download button
+    const downloadBtn = document.createElement("button");
+    downloadBtn.className = "download-btn";
+    downloadBtn.innerHTML = "⬇️";
+    downloadBtn.title = "Download Result";
+    downloadBtn.onclick = downloadResult;
+    box.appendChild(downloadBtn);
+
+    status.textContent = `✓ Try-on complete for ${detectedGarmentType}!`;
+    status.className = "status success";
+  } catch (error) {
+    status.textContent = "❌ Try-on failed. Please try again.";
+    status.className = "status";
+    console.error("Try-on error:", error);
+  } finally {
+    tryOnBtn.disabled = false;
+  }
+};
+
+// ---------------- Download Result ----------------
+function downloadResult() {
+  if (!resultImageBlob) {
+    alert("No result to download");
+    return;
+  }
+  
+  const url = URL.createObjectURL(resultImageBlob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `fashion-aura-tryon-${Date.now()}.png`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  // Show feedback
+  const btn = document.querySelector(".download-btn");
+  if (btn) {
+    const originalHTML = btn.innerHTML;
+    btn.innerHTML = "✓";
+    setTimeout(() => btn.innerHTML = originalHTML, 1000);
+  }
+}
+</script>
+</body>
+</html>
