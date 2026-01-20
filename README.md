@@ -286,7 +286,7 @@ Fashion-Aura/
 │
 ├── index.html                   # Frontend UI
 ├── demo.gif                     # demo video in .gif format
-├── demo.png                     # Sample screenshot of Fashion Aura Result
+├── Demo.png                     # Sample screenshot of Fashion Aura Result
 ├── demo.mp4                     # demo video in .mp4 format
 ├── nginx.conf                   # Nginx configuration
 ├── docker-compose.yml           # Docker orchestration
