@@ -18,13 +18,13 @@
 
 ## 📺 Demo
 
-> **Video Demonstration**
-> 
-> Watch Fashion Aura in action - see how users can virtually try on thousands of garments in real-time!
-
-https://github.com/user-attachments/assets/your-demo-video.mp4
-
-*(Replace with your actual demo video link)*
+<div align="center">
+  
+  ![Fashion Aura Demo](demo.gif)
+  
+  *Watch Fashion Aura in action - virtual try-on in real-time!*
+  
+</div>
 
 ---
 
@@ -285,9 +285,11 @@ Fashion-Aura/
 │   └── update_buy_urls.py       # Brand URL generator
 │
 ├── index.html                   # Frontend UI
+├── demo.gif                     # demo video in .gif format
+├── demo.png                     # Sample screenshot of Fashion Aura Result
+├── demo.mp4                     # demo video in .mp4 format
 ├── nginx.conf                   # Nginx configuration
 ├── docker-compose.yml           # Docker orchestration
-├── n8n.json                     # N8N workflow (optional)
 └── README.md                    # This file
 ```
 
