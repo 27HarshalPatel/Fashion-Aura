@@ -20,9 +20,9 @@
 
 <div align="center">
   
-  ![Fashion Aura Demo](demo.gif)
+  [![Fashion Aura Demo](demo.gif)](Fashion-Aura-Launch-video.mp4)
   
-  *Watch Fashion Aura in action - virtual try-on in real-time!*
+  *One photo, three shirts. Click for the version with sound, or watch the [full walkthrough](demo.mp4).*
   
 </div>
 
